@@ -13,89 +13,37 @@ use Illuminate\Http\Request;
 class LookupController extends Controller
 {
     public function lookup(Request $request) {
-        if ($request->get('type') == 'minecraft') {
-            if ($request->get('username')) {
-                $username = $request->get('username');
-                $userId = false;
-            }
-            if ($request->get('id')){
-                $username=false;
-                $userId = $request->get('id');
-            }
+        // Plan:
+        // Requestable Interface > Service Class > three subclasses: minecraft, steam and xlb
 
-            if ($username) {
-                $guzzle = new Client();
-                $response = $guzzle->get(
-                    "https://api.mojang.com/users/profiles/minecraft/{$username}"
-                );
+        /*
+         Service class has construct for getting the correct url based on username or id (just an assoc array ok "username"=>url and "id"=>url).
+         It also has the layout code for the makeRequest() method which does the guzzle request stuff
 
-                $match = json_decode($response->getBody()->getContents());
+         url arrays:
 
-                return [
-                    'username' => $match->name,
-                    'id' => $match->id,
-                    'avatar' => "https://crafatar.com/avatars" . $match->id
-                ];
-            }
+         minecraft:
+         [
+            'username' => "https://api.mojang.com/users/profiles/minecraft/{$username}",
+            'id' = "https://sessionserver.mojang.com/session/minecraft/profile/{$userId}"
+         ]
 
-            if ($userId)
-            {
-                $guzzle = new Client();
-                $response = $guzzle->get(
-                    "https://sessionserver.mojang.com/session/minecraft/profile/{$userId}"
-                );
+         steam:
+         [
+            'username' => 'UNSUPPORTED - figure this out later',
+            'id' = "https://ident.tebex.io/usernameservices/4/username/{$id}"
+         ]
 
-                $match = json_decode($response->getBody()->getContents());
-                return [
-                    'username' => $match->name,
-                    'id' => $match->id,
-                    'avatar' => "https://crafatar.com/avatars" . $match->id
-                ];
-            }
-        } elseif ($request->get('type')=='steam') {
-            if ($request->get("username")) {
-                die("Steam only supports IDs");
-            } else {
-                $id = $request->get("id");
-                $guzzle = new Client();
-                $url = "https://ident.tebex.io/usernameservices/4/username/{$id}";
+         xbl:
+         [
+            'username' => "https://ident.tebex.io/usernameservices/3/username/" . $request->get("username") . "?type=username"'",
+            'id' = "https://sessionserver.mojang.com/session/minecraft/profile/{$userId}"
+         ]
 
-                $match = json_decode($guzzle->get($url)->getBody()->getContents());
-
-                return [
-                    'username' => $match->username,
-                    'id' => $match->id,
-                    'avatar' => $match->meta->avatar
-                ];
-            }
-
-        }elseif($request->get('type') === 'xbl'){
-            if ($request->get("username")) {
-                $guzzle = new Client();
-                $response = $guzzle->get("https://ident.tebex.io/usernameservices/3/username/" . $request->get("username") . "?type=username");
-                $profile = json_decode($response->getBody()->getContents());
-
-                return [
-                    'username' => $profile->username,
-                    'id' => $profile->id,
-                    'avatar' => $profile->meta->avatar
-                ];
-            }
-
-            if ($request->get("id")) {
-                $id = $request->get("id");
-                $guzzle = new Client();
-                $response = $guzzle->get("https://ident.tebex.io/usernameservices/3/username/" . $id);
-                $profile = json_decode($response->getBody()->getContents());
-
-                return [
-                    'username' => $profile->username,
-                    'id' => $profile->id,
-                    'avatar' => $profile->meta->avatar
-                ];
-            }
-        }
-        //We can't handle this - maybe provide feedback?
-        die();
+         $id = $request->get("id");
+         $guzzle = new Client();
+         $url = "https://ident.tebex.io/usernameservices/4/username/{$id}";
+         $match = json_decode($guzzle->get($url)->getBody()->getContents());
+        */
     }
 }
