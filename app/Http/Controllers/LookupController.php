@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare( strict_types = 1 );
 
 namespace App\Http\Controllers;
 
@@ -9,32 +9,32 @@ use App\Services\SteamService;
 use App\Services\MinecraftService;
 
 /**
- * Class LookupController
- *
- * @package App\Http\Controllers
- */
-class LookupController extends Controller
-{
-    public function lookup(Request $request) {
+* Class LookupController
+*
+* @package App\Http\Controllers
+*/
+
+class LookupController extends Controller {
+    public function lookup( Request $request ) {
         $services = [
             'minecraft' => MinecraftService::class,
             'steam' => SteamService::class,
             'xbl' => XBLService::class,
         ];
 
-        $serviceClass = $services[$request->get('type')];
-
-        if(!class_exists($serviceClass)){
-            return response()->json("Service not found", 400);
+        if ( !array_key_exists( $request->get( 'type' ), $services ) ) {
+            return response()->json( 'Service not found', 400 );
         }
+
+        $serviceClass = $services[ $request->get( 'type' ) ];
 
         $service = new $serviceClass();
 
-        $type = $request->get('id') ? "id" : "username";
-        $value = $request->get('id') ?? $request->get('username');
+        $type = $request->get( 'id' ) ? 'id' : 'username';
+        $value = $request->get( 'id' ) ?? $request->get( 'username' );
 
-        $response = $service->makeRequest($type, $value);
+        $response = $service->makeRequest( $type, $value );
 
-        return response()->json($response);
+        return response()->json( $response );
     }
 }

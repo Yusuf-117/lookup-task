@@ -24,13 +24,23 @@ abstract class Service {
         $baseUrl = $this->baseUrls[ $type ] ?? null;
 
         if ( !$baseUrl || !$value ) {
-            throw new Exception( 'Incorrect User property or value' );
+            return response()->json( 'Incorrect User property or value', 400 );
         }
 
-        $guzzle = new Client();
-        $url = sprintf( $baseUrl, $value );
-        $match = json_decode( $guzzle->get( $url )->getBody()->getContents() );
+        try{
 
-        return $this->transformResponse($match);
+            $guzzle = new Client();
+            $url = sprintf( $baseUrl, $value );
+            $match = json_decode( $guzzle->get( $url )->getBody()->getContents() );
+
+            return $this->transformResponse($match);
+        }catch(\Exception $e){
+            if($e->hasResponse()){
+                $body = json_decode($e->getResponse()->getBody()->getContents());
+                $body->status = $e->getResponse()->getStatusCode();
+
+                return $body;
+            }
+        }
     }
 }
