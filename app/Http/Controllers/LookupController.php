@@ -4,9 +4,6 @@ namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use App\Services\XBLService;
-use App\Services\SteamService;
-use App\Services\MinecraftService;
 
 /**
 * Class LookupController
@@ -16,11 +13,7 @@ use App\Services\MinecraftService;
 
 class LookupController extends Controller {
     public function lookup( Request $request ) {
-        $services = [
-            'minecraft' => MinecraftService::class,
-            'steam' => SteamService::class,
-            'xbl' => XBLService::class,
-        ];
+        $services = config( 'serviceProviders' );
 
         if ( !array_key_exists( $request->get( 'type' ), $services ) ) {
             return response()->json( 'Service not found', 400 );
