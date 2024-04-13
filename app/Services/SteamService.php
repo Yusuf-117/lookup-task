@@ -6,7 +6,7 @@ class SteamService extends Service {
 
     public function __construct() {
         parent::__construct( [
-            // username not supported for steam
+            'username' => "Steam only supports IDs",
             'id' => 'https://ident.tebex.io/usernameservices/4/username/%s'
         ] );
     }

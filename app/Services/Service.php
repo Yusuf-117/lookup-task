@@ -27,6 +27,10 @@ abstract class Service {
             return response()->json( 'Incorrect User property or value', 400 );
         }
 
+        if (!filter_var($baseUrl, FILTER_VALIDATE_URL)) {
+            return response()->json( $baseUrl, 400 );
+        }
+
         try{
 
             $guzzle = new Client();
