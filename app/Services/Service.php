@@ -31,6 +31,6 @@ abstract class Service {
         $url = sprintf( $baseUrl, $value );
         $match = json_decode( $guzzle->get( $url )->getBody()->getContents() );
 
-        return $match;
+        return $this->transformResponse($match);
     }
 }
