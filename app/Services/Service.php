@@ -3,48 +3,42 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
+use App\Contracts\UserDetailsInterface;
 
-abstract class Service {
-    protected $baseUrls;
+abstract class Service implements UserDetailsInterface {
+    protected $endpoints;
 
-    public function __construct( $baseUrls ) {
-        $this->baseUrls = $baseUrls;
+    public function __construct( $endpoints ) {
+        $this->endpoints = $endpoints;
     }
 
-    /**
-    * Make a request based on user props
-    *
-    * @param string $type - 'username' or 'id'
-    * @param string $value - the value or username or id
-    *
-    * @return array The user details
-    */
+    public function getUserDetails( $type, $value ) {
+        $target = $this->endpoints[ $type ] ?? null;
 
-    public function makeRequest( $type, $value ) {
-        $baseUrl = $this->baseUrls[ $type ] ?? null;
-
-        if ( !$baseUrl || !$value ) {
+        if ( !$target || !$value ) {
             return response()->json( 'Incorrect User property or value', 400 );
         }
 
-        if (!filter_var($baseUrl, FILTER_VALIDATE_URL)) {
-            return response()->json( $baseUrl, 400 );
+        //If $target is not a NULL or a URL then it's an error string set in the subclass
+        if ( !filter_var( $target, FILTER_VALIDATE_URL ) ) {
+            return response()->json( $target, 400 );
         }
 
-        try{
-
+        try {
             $guzzle = new Client();
-            $url = sprintf( $baseUrl, $value );
+            $url = sprintf( $target, $value );
             $match = json_decode( $guzzle->get( $url )->getBody()->getContents() );
 
-            return $this->transformResponse($match);
-        }catch(\Exception $e){
-            if($e->hasResponse()){
-                $body = json_decode($e->getResponse()->getBody()->getContents());
+            return $this->transformResponse( $match );
+        } catch( \Exception $e ) {
+            if ( $e->hasResponse() ) {
+                $body = json_decode( $e->getResponse()->getBody()->getContents() );
                 $body->status = $e->getResponse()->getStatusCode();
 
                 return $body;
             }
         }
     }
+
+    abstract protected function transformResponse( $response );
 }
