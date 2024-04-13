@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use App\Services\XBLService;
+use App\Services\SteamService;
+use App\Services\MinecraftService;
 
 /**
  * Class LookupController
@@ -13,37 +16,25 @@ use Illuminate\Http\Request;
 class LookupController extends Controller
 {
     public function lookup(Request $request) {
-        // Plan:
-        // Requestable Interface > Service Class > three subclasses: minecraft, steam and xlb
+        $services = [
+            'minecraft' => MinecraftService::class,
+            'steam' => SteamService::class,
+            'xbl' => XBLService::class,
+        ];
 
-        /*
-         Service class has construct for getting the correct url based on username or id (just an assoc array ok "username"=>url and "id"=>url).
-         It also has the layout code for the makeRequest() method which does the guzzle request stuff
+        $serviceClass = $services[$request->get('type')];
 
-         url arrays:
+        if(!class_exists($serviceClass)){
+            return response()->json("Service not found", 400);
+        }
 
-         minecraft:
-         [
-            'username' => "https://api.mojang.com/users/profiles/minecraft/{$username}",
-            'id' = "https://sessionserver.mojang.com/session/minecraft/profile/{$userId}"
-         ]
+        $service = new $serviceClass();
 
-         steam:
-         [
-            'username' => 'UNSUPPORTED - figure this out later',
-            'id' = "https://ident.tebex.io/usernameservices/4/username/{$id}"
-         ]
+        $type = $request->get('id') ? "id" : "username";
+        $value = $request->get('id') ?? $request->get('username');
 
-         xbl:
-         [
-            'username' => "https://ident.tebex.io/usernameservices/3/username/" . $request->get("username") . "?type=username"'",
-            'id' = "https://sessionserver.mojang.com/session/minecraft/profile/{$userId}"
-         ]
+        $response = $service->makeRequest($type, $value);
 
-         $id = $request->get("id");
-         $guzzle = new Client();
-         $url = "https://ident.tebex.io/usernameservices/4/username/{$id}";
-         $match = json_decode($guzzle->get($url)->getBody()->getContents());
-        */
+        return response()->json($response);
     }
 }
