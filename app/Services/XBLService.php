@@ -12,11 +12,11 @@ class XBLService extends Service{
     }
 
     protected function transformResponse( $response ) {
-        return [
+        return isset($response->username,$response->id,$response->meta->avatar) ? [
             'username' => $response->username,
             'id' => $response->id,
             'avatar' => $response->meta->avatar
-        ];
+        ] : $response;
     }
 
 }
