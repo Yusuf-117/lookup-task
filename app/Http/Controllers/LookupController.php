@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 /**
@@ -41,11 +42,24 @@ class LookupController extends Controller {
         $serviceClass = $services[ $request->get( 'type' ) ];
         $service = new $serviceClass();
 
-        $type = $request->filled( 'id' ) ? 'id' : 'username';
-        $value = $request->input( $type );
+        $userProp = $request->filled( 'id' ) ? 'id' : 'username';
+        $value = $request->input( $userProp );
+        $serviceType = $request->get( 'type' );
 
-        $response = $service->getUserDetails( $type, $value );
+        $cacheKey = "${serviceType}_{$userProp}_{$value}";
+
+        $cachedData = Cache::get($cacheKey);
+        if ($cachedData) {
+            return response()->json($cachedData);
+        }
+
+        $response = $service->getUserDetails( $userProp, $value );
+
         $status = $response["status"] ?? $response["code"] ?? 200;
+
+        if($status == 200){
+            Cache::put($cacheKey, $response, now()->addMinutes(60));
+        }
         return response()->json( $response, $status );
     }
 }
