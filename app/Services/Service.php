@@ -16,12 +16,18 @@ abstract class Service implements UserDetailsInterface {
         $target = $this->endpoints[ $type ] ?? null;
 
         if ( !$target || !$value ) {
-            return response()->json( 'Incorrect User property or value', 400 );
+            return [
+                "errorMessage" => 'Incorrect User property or value',
+                "status" => 400
+            ];
         }
 
         //If $target is not a NULL or a URL then it's an error string set in the subclass
         if ( !filter_var( $target, FILTER_VALIDATE_URL ) ) {
-            return response()->json( $target, 400 );
+            return [
+                "errorMessage" => $target,
+                "status" => 400
+            ];
         }
 
         try {
@@ -34,8 +40,7 @@ abstract class Service implements UserDetailsInterface {
             if ( $e->hasResponse() ) {
                 $body = json_decode( $e->getResponse()->getBody()->getContents() );
                 $body->status = $e->getResponse()->getStatusCode();
-
-                return $body;
+                return get_object_vars($body);
             }
         }
     }
