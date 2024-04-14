@@ -5,11 +5,6 @@ namespace Tests\Feature;
 use Tests\TestCase;
 
 class MinecraftTest extends TestCase {
-    /**
-    * A basic feature test example.
-    *
-    * @return void
-    */
 
     public function testMinecraftUsernameEndpointReturnsCorrectJson() {
         $response = $this->get( '/lookup?type=minecraft&username=Notch' );

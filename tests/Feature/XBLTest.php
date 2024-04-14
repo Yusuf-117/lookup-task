@@ -5,11 +5,6 @@ namespace Tests\Feature;
 use Tests\TestCase;
 
 class XBLTest extends TestCase {
-    /**
-    * A basic feature test example.
-    *
-    * @return void
-    */
 
     public function testXblUsernameEndpointReturnsCorrectJson() {
         $response = $this->get( '/lookup?type=xbl&username=tebex' );
