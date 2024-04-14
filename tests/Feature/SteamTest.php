@@ -18,4 +18,11 @@ class SteamTest extends TestCase {
         $response->assertStatus( 200 )
         ->assertJson( json_decode( '{"username":"Tebex","id":"76561198806141009","avatar":"https:\/\/avatars.steamstatic.com\/c86f94b0515600e8f6ff869d13394e05cfa0cd6a.jpg"}', true ) );
     }
+
+   public function testSteamIdEndpointFailsOnIncorrectId() {
+        $response = $this->get( '/lookup?type=steam&id=NotAnId' );
+
+        $response->assertStatus( 400 )
+        ->assertJson( json_decode( '{"code": 400,"message": "Unable to find a profile with that Steam ID"}', true ) );
+    }
 }

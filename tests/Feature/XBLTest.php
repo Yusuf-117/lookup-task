@@ -19,4 +19,11 @@ class XBLTest extends TestCase {
         $response->assertStatus( 200 )
         ->assertJson( json_decode( '{"username":"d34dmanwalkin","id":"2533274884045330","avatar":"https:\/\/avatar-ssl.xboxlive.com\/avatar\/2533274884045330\/avatarpic-l.png"}', true ) );
     }
+
+    public function testXblIdEndpointFailsOnIncorrectId() {
+        $response = $this->get( '/lookup?type=xbl&id=NotAnId' );
+
+        $response->assertStatus( 400 )
+        ->assertJson( json_decode( '{"code": 400,"message": "Unable to find a player with that XUID"}', true ) );
+    }
 }

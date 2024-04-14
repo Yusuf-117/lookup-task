@@ -19,4 +19,11 @@ class MinecraftTest extends TestCase {
         $response->assertStatus( 200 )
         ->assertJson( json_decode( '{"username":"Test","id":"d8d5a9237b2043d8883b1150148d6955","avatar":"https:\/\/crafatar.com\/avatars/d8d5a9237b2043d8883b1150148d6955"}', true ) );
     }
+
+    public function testMinecraftUsernameEndpointFailsOnIncorrectUsername() {
+        $response = $this->get( '/lookup?type=minecraft&username=SurelyDoesntExist' );
+
+        $response->assertStatus( 404 )
+        ->assertJson( json_decode( '{"path": "/users/profiles/minecraft/SurelyDoesntExist","errorMessage": "Couldn\'t find any profile with name SurelyDoesntExist","status": 404}', true ) );
+    }
 }
