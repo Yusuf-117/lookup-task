@@ -45,7 +45,7 @@ class LookupController extends Controller {
         $value = $request->input( $type );
 
         $response = $service->getUserDetails( $type, $value );
-        $status = $response["status"] ?? 200;
+        $status = $response["status"] ?? $response["code"] ?? 200;
         return response()->json( $response, $status );
     }
 }

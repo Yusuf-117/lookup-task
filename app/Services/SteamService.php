@@ -16,7 +16,7 @@ class SteamService extends Service {
             'username' => $response->username,
             'id' => $response->id,
             'avatar' => $response->meta->avatar
-        ] : $response;
+        ] : get_object_vars($response->error);
 
     }
 

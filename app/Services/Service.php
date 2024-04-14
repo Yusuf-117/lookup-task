@@ -40,7 +40,7 @@ abstract class Service implements UserDetailsInterface {
             if ( $e->hasResponse() ) {
                 $body = json_decode( $e->getResponse()->getBody()->getContents() );
                 $body->status = $e->getResponse()->getStatusCode();
-                return json_decode(json_encode($body),true);
+                return get_object_vars($body);
             }
         }
     }
